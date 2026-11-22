@@ -9,7 +9,17 @@ and sends video, boxes and warnings to the **Next.js dashboard**.
 - Message formats (the contract for every app): [`docs/protocol.md`](docs/protocol.md)
 - Database tables: [`docs/database.md`](docs/database.md)
 
-## 1. Install (Windows, once)
+## Quick start (Windows)
+
+You need **Python 3.12** and **Node.js 20+**. Then double-click:
+
+1. **`setup.bat`**: installs everything (finds out by itself if you have an NVIDIA GPU).
+2. **`start.bat`**: starts the server and opens the dashboard at http://localhost:3000.
+
+Using GitHub Copilot, Claude or Cursor? Ask it to *"set up and run this project"*: the exact steps are in
+[`AGENTS.md`](AGENTS.md) and [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
+
+## 1. Install step by step (if you prefer)
 
 You need **Python 3.12** and **Node.js 20 or newer**. Then, in this folder, double-click one of:
 
