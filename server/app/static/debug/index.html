@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debug Viewer</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; padding: 12px; background: #0d0f12; color: #eef1f5; font: 14px system-ui, sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px; }
+  .cam { background: #171a1f; border-radius: 10px; padding: 8px; }
+  .cam h3 { margin: 0 0 6px; font-size: 14px; display: flex; justify-content: space-between; }
+  canvas { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 6px; display: block; }
+  .lvl-danger { color: #fb923c; } .lvl-caution { color: #facc15; } .lvl-none { color: #8b94a3; }
+  pre { font-size: 12px; color: #8b94a3; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h2 style="margin:0 0 8px">Debug viewer <small id="conn" style="color:#8b94a3">connecting…</small></h2>
+<div class="grid" id="grid"></div>
+<pre id="stats"></pre>
+<script>
+const POS = ["front", "left", "right", "back"];
+const COLORS = { none: "#ffffff", caution: "#facc15", danger: "#fb923c", info: "#3b82f6" };
+const grid = document.getElementById("grid");
+const cams = {};
+for (const p of POS) {
+  const d = document.createElement("div");
+  d.className = "cam";
+  d.innerHTML = `<h3><span>${p}</span><span class="w lvl-none">offline</span></h3><canvas width="640" height="360"></canvas>`;
+  grid.appendChild(d);
+  cams[p] = { canvas: d.querySelector("canvas"), w: d.querySelector(".w"), bitmap: null, overlay: null, status: "offline", warning: null };
+}
+function draw(p) {
+  const c = cams[p], ctx = c.canvas.getContext("2d"), W = c.canvas.width, H = c.canvas.height;
+  if (c.bitmap) ctx.drawImage(c.bitmap, 0, 0, W, H); else { ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H); }
+  if (!c.overlay) return;
+  for (const o of c.overlay.objects) {
+    const [x1, y1, x2, y2] = o.box;
+    ctx.strokeStyle = COLORS[o.level] || "#fff";
+    ctx.lineWidth = o.level === "danger" ? 4 : o.level === "caution" ? 3 : 2;
+    ctx.strokeRect(x1 * W, y1 * H, (x2 - x1) * W, (y2 - y1) * H);
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.font = "13px system-ui";
+    const d = o.distance_m == null ? "" : ` ${o.distance_m}m`;
+    ctx.fillText(`${o.cls}#${o.track_id}${d}${o.predicted ? "" : " •"}`, x1 * W + 3, y1 * H - 4);
+  }
+}
+let pendingCam = null;
+function connect() {
+  const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/viewer");
+  ws.binaryType = "arraybuffer";
+  ws.onopen = () => { document.getElementById("conn").textContent = "connected"; ws.send(JSON.stringify({ type: "subscribe", video: "all" })); };
+  ws.onclose = () => { document.getElementById("conn").textContent = "reconnecting…"; setTimeout(connect, 1000); };
+  ws.onmessage = async (ev) => {
+    if (typeof ev.data !== "string") {
+      const dv = new DataView(ev.data);
+      const p = POS[dv.getUint8(2)];
+      const bmp = await createImageBitmap(new Blob([new Uint8Array(ev.data, 24)], { type: "image/jpeg" }));
+      if (cams[p].bitmap) cams[p].bitmap.close();
+      cams[p].bitmap = bmp;
+      draw(p);
+      return;
+    }
+    const m = JSON.parse(ev.data);
+    if (m.type === "overlay") { cams[m.camera].overlay = m; draw(m.camera); }
+    else if (m.type === "welcome") { for (const c of m.cameras) setStatus(c.position, c.status); }
+    else if (m.type === "camera_status") setStatus(m.position, m.status);
+    else if (m.type === "warning_state") {
+      for (const p of POS) {
+        const w = m.cameras[p];
+        cams[p].warning = w;
+        if (cams[p].status === "online") { cams[p].w.textContent = w.level === "none" ? "online" : `${w.level}: ${w.text}`; cams[p].w.className = "w lvl-" + w.level; }
+      }
+    }
+    else if (m.type === "stats") document.getElementById("stats").textContent = JSON.stringify(m, null, 1);
+  };
+}
+function setStatus(p, s) {
+  cams[p].status = s;
+  cams[p].w.textContent = s; cams[p].w.className = "w lvl-none";
+  if (s === "offline") { cams[p].bitmap = null; cams[p].overlay = null; draw(p); }
+}
+connect();
+</script>
+</body>
+</html>

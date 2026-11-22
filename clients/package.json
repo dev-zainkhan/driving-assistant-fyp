@@ -1,0 +1,17 @@
+{
+  "name": "da-clients",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "nextjs-web"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write \"shared/**/*.js\" \"nextjs-web/{app,src}/**/*.{js,jsx,css}\"",
+    "dev:next": "npm run dev -w nextjs-web",
+    "build:next": "npm run build -w nextjs-web"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

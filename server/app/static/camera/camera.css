@@ -1,0 +1,38 @@
+:root {
+  --bg: #0d0f12; --panel: #171a1f; --line: #2a2f37; --text: #eef1f5; --muted: #8b94a3;
+  --accent: #2f7cf6; --live: #22c55e; --warn: #f59e0b; --bad: #ef4444;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; padding-bottom: 40px; background: var(--bg); color: var(--text);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; max-width: 640px; margin-inline: auto; }
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+h1 { font-size: 22px; margin: 0; }
+h2 { font-size: 15px; color: var(--muted); font-weight: 600; margin: 18px 0 8px; }
+.pill { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; background: var(--line); }
+.pill.live { background: var(--live); color: #04120a; }
+.pill.wait { background: var(--warn); color: #1b1200; }
+.pill.bad { background: var(--bad); }
+.positions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+button, .big { font: inherit; color: var(--text); background: var(--panel); border: 2px solid var(--line);
+  border-radius: 14px; min-height: 64px; font-size: 20px; font-weight: 600; cursor: pointer; }
+.pos { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.pos small { font-size: 12px; font-weight: 500; color: var(--muted); min-height: 1em; }
+.pos.selected { border-color: var(--accent); background: #13233f; }
+.pos.taken small { color: var(--warn); }
+.big { display: flex; align-items: center; justify-content: center; width: 100%; }
+.file input { display: none; }
+.primary { background: var(--accent); border-color: var(--accent); margin-top: 16px; }
+.primary.stop { background: var(--bad); border-color: var(--bad); }
+button:disabled { opacity: .45; cursor: default; }
+.muted { color: var(--muted); font-size: 14px; margin-top: 6px; word-break: break-all; }
+video { width: 100%; margin-top: 16px; border-radius: 12px; background: #000; aspect-ratio: 16/9; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 14px; }
+.stats div { background: var(--panel); border-radius: 10px; padding: 8px; text-align: center; }
+.stats .label { display: block; font-size: 11px; color: var(--muted); }
+.stats b { font-size: 18px; }
+details { margin-top: 20px; background: var(--panel); border-radius: 12px; padding: 12px; }
+summary { cursor: pointer; font-weight: 600; }
+details label { display: block; margin-top: 10px; font-size: 14px; color: var(--muted); }
+details input { display: block; width: 100%; margin-top: 4px; padding: 10px; font: inherit; color: var(--text);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }

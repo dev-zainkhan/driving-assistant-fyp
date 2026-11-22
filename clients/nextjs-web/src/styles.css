@@ -1,0 +1,436 @@
+:root {
+  --bg: #0d0f12;
+  --panel: #171a1f;
+  --line: #2a2f37;
+  --text: #eef1f5;
+  --muted: #8b94a3;
+  --orange: #fb923c;
+  --yellow: #facc15;
+  --blue: #3b82f6;
+  --ok: #22c55e;
+  --bad: #ef4444;
+  --gap: 1vmin;
+  --radius: 1.6vmin;
+  color-scheme: dark;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font:
+    16px/1.4 system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ---------------- live view: constant layout ---------------- */
+.live-root {
+  position: fixed;
+  inset: 0;
+  padding: var(--gap);
+  background: var(--bg);
+}
+.live-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 18fr 64fr 18fr; /* wider side slots (was 13 / 72 / 13) */
+  grid-template-rows: 66fr 34fr; /* a little more room for the back camera (was 70 / 28) */
+  grid-template-areas:
+    "left front right"
+    "left back  right";
+  gap: var(--gap);
+  transition: transform 0.25s ease;
+}
+.live-grid.mirrored {
+  transform: scaleX(-1);
+}
+
+.slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+  outline: 0 solid transparent;
+  transition: outline-color 0.2s;
+}
+.slot-front {
+  grid-area: front;
+}
+.slot-back {
+  grid-area: back;
+}
+.slot-left {
+  grid-area: left;
+}
+.slot-right {
+  grid-area: right;
+}
+.slot canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.slot.on.lvl-danger:not(.slot-front) {
+  outline: 0.5vmin solid var(--orange);
+  outline-offset: -0.5vmin;
+}
+.slot.on.lvl-caution:not(.slot-front) {
+  outline: 0.4vmin solid var(--yellow);
+  outline-offset: -0.4vmin;
+}
+
+.badge {
+  position: absolute;
+  left: 1.2vmin;
+  bottom: 1.2vmin;
+  width: 4.6vmin;
+  height: 4.6vmin;
+  min-width: 26px;
+  min-height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: max(13px, 2.2vmin);
+  background: rgba(23, 26, 31, 0.85);
+  border: 1px solid #3a404a;
+  color: #cfd5de;
+}
+.slot-left .badge,
+.slot-right .badge {
+  left: 50%;
+  transform: translateX(-50%);
+}
+.badge-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 6px var(--blue);
+}
+.offline-tag {
+  position: absolute;
+  top: 1.2vmin;
+  right: 1.2vmin;
+  font-size: max(11px, 1.5vmin);
+  color: #9aa3b1;
+  background: rgba(60, 64, 72, 0.7);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.slot-left .offline-tag,
+.slot-right .offline-tag {
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.pill {
+  --pill-bg: var(--orange);
+  position: absolute;
+  top: 1.4vmin;
+  left: 1.4vmin;
+  display: flex;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 0.7vmin 1.6vmin;
+  border-radius: 999px;
+  background: var(--pill-bg);
+  color: #1a1206;
+  font-weight: 700;
+  font-size: max(14px, 2.6vmin);
+  box-shadow: 0 2px 12px rgba(251, 146, 60, 0.45);
+  animation: pill-in 0.18s ease-out;
+  max-width: calc(100% - 2.8vmin);
+  white-space: nowrap;
+}
+.pill span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pill-caution {
+  --pill-bg: var(--yellow);
+  box-shadow: 0 2px 12px rgba(250, 204, 21, 0.35);
+}
+.slot-left .pill,
+.slot-right .pill {
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.6vmin 1.2vmin;
+  font-size: max(12px, 2vmin);
+}
+.slot-front .pill {
+  font-size: max(16px, 3.2vmin);
+}
+@keyframes pill-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* tap menu: bottom right of the front view */
+.tap-menu {
+  grid-area: front;
+  align-self: end;
+  justify-self: end;
+  display: flex;
+  gap: 1.6vmin;
+  margin: 2vmin;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+.tap-menu.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+.round {
+  width: max(52px, 8vmin);
+  height: max(52px, 8vmin);
+  border-radius: 50%;
+  border: 1px solid #4a515c;
+  background: rgba(23, 26, 31, 0.88);
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(6px);
+}
+.round.active {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+
+.conn-banner {
+  position: fixed;
+  top: 2vmin;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bad);
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 999px;
+  z-index: 10;
+}
+.stats-box {
+  position: fixed;
+  right: 2vmin;
+  top: 2vmin;
+  z-index: 10;
+  background: rgba(13, 15, 18, 0.88);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font:
+    12px/1.6 ui-monospace,
+    Consolas,
+    monospace;
+}
+
+/* ---------------- start screen ---------------- */
+.start {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  overflow: auto;
+}
+.start-card {
+  width: min(520px, 100%);
+  text-align: center;
+}
+.logo {
+  color: var(--blue);
+}
+.start h1 {
+  font-size: clamp(26px, 5vw, 38px);
+  margin: 8px 0 28px;
+}
+.start-btn {
+  width: 100%;
+  min-height: 88px;
+  font-size: clamp(20px, 3.6vw, 28px);
+  font-weight: 700;
+  border: 0;
+  border-radius: 22px;
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(59, 130, 246, 0.35);
+}
+.start-btn:disabled {
+  opacity: 0.6;
+}
+.server-field {
+  display: block;
+  margin-top: 24px;
+  text-align: left;
+  color: var(--muted);
+  font-size: 14px;
+}
+.server-field input {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  user-select: text;
+}
+.error {
+  color: #fca5a5;
+  margin-top: 14px;
+}
+
+/* ---------------- settings ---------------- */
+.settings {
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  padding: 16px;
+  background: var(--bg);
+  z-index: 20;
+}
+.settings header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 760px;
+  margin: 0 auto 12px;
+}
+.settings h1 {
+  font-size: 24px;
+  margin: 0;
+}
+.back-btn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+.card {
+  max-width: 760px;
+  margin: 0 auto 14px;
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+.card h2 {
+  font-size: 16px;
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.row:first-of-type {
+  border-top: 0;
+}
+.cap {
+  text-transform: capitalize;
+}
+.ok {
+  color: var(--ok);
+}
+.bad {
+  color: #fca5a5;
+}
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+.danger-btn {
+  display: block;
+  width: min(760px, 100%);
+  margin: 8px auto 24px;
+  min-height: 52px;
+  border-radius: 14px;
+  border: 1px solid #7f1d1d;
+  background: #2a1214;
+  color: #fca5a5;
+  font-weight: 600;
+}
+
+.card select {
+  flex: 1;
+  max-width: 60%;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.card code {
+  background: var(--bg);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.primary-btn,
+.secondary-btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.primary-btn {
+  background: var(--blue);
+  border: 0;
+  color: #fff;
+}
+.secondary-btn {
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.primary-btn:disabled,
+.secondary-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}

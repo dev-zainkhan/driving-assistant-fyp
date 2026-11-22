@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Camera Node</title>
+  <link rel="stylesheet" href="camera.css">
+</head>
+<body>
+  <header>
+    <h1>Camera Node</h1>
+    <span id="conn" class="pill off">idle</span>
+  </header>
+
+  <section id="setup">
+    <h2>1. Position</h2>
+    <div class="positions">
+      <button class="pos" data-pos="front">Front<small></small></button>
+      <button class="pos" data-pos="left">Left<small></small></button>
+      <button class="pos" data-pos="right">Right<small></small></button>
+      <button class="pos" data-pos="back">Back<small></small></button>
+    </div>
+
+    <h2>2. Video</h2>
+    <label class="big file">
+      Choose video
+      <input id="file" type="file" accept="video/*">
+    </label>
+    <div id="fileName" class="muted">No video chosen</div>
+  </section>
+
+  <video id="video" muted loop playsinline></video>
+
+  <section id="live">
+    <button id="play" class="big primary" disabled>Play</button>
+    <div class="stats">
+      <div><span class="label">Position</span><b id="sPos">-</b></div>
+      <div><span class="label">Sent fps</span><b id="sFps">0</b></div>
+      <div><span class="label">Round trip</span><b id="sRtt">-</b></div>
+      <div><span class="label">Dropped</span><b id="sDrop">0</b></div>
+    </div>
+    <div id="msg" class="muted"></div>
+  </section>
+
+  <details id="settings">
+    <summary>Settings</summary>
+    <label>Server address <input id="server" type="text" autocomplete="off"></label>
+    <label>JPEG quality <input id="quality" type="number" min="0.3" max="0.95" step="0.05" value="0.7"></label>
+    <label>Frames per second <input id="fps" type="number" min="5" max="30" step="1" value="30"></label>
+  </details>
+
+  <canvas id="canvas" width="640" height="360" hidden></canvas>
+  <script src="camera.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+/* Live view extras: pill + banner stack, sign banners (slides 26-28), incident notice (45),
+   night vision tag (30) and the demo tag. */
+
+.slot-top {
+  position: absolute;
+  top: 1.4vmin;
+  left: 1.4vmin;
+  right: 1.4vmin;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1vmin;
+  pointer-events: none;
+  z-index: 2;
+}
+.slot-top .pill {
+  position: static;
+  transform: none;
+}
+.slot-left .slot-top,
+.slot-right .slot-top {
+  align-items: center;
+}
+.slot-left .slot-top .pill,
+.slot-right .slot-top .pill {
+  transform: none;
+  left: auto;
+}
+
+/* slides 26-28: sign banners */
+.sign-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.4vmin;
+  padding: 1vmin 2.2vmin 1vmin 1vmin;
+  border-radius: 2vmin;
+  color: #fff;
+  max-width: 100%;
+  animation: pill-in 0.18s ease-out;
+}
+.sign-banner b {
+  display: block;
+  font-size: max(16px, 3vmin);
+}
+.sign-banner small {
+  display: block;
+  font-size: max(11px, 1.7vmin);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+.sign-red {
+  background: #d32f2f;
+}
+.sign-blue {
+  background: #1f4fd8;
+}
+.sign-icon {
+  width: max(40px, 6vmin);
+  height: max(40px, 6vmin);
+  border-radius: 1.4vmin;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.2);
+  flex: none;
+}
+
+/* slide 45: incident saved notice */
+.incident-notice {
+  position: fixed;
+  top: 3vmin;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 1.6vmin;
+  padding: 1.2vmin 2.6vmin 1.2vmin 1.2vmin;
+  border-radius: 999px;
+  background: #fff;
+  color: #1b1d22;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  max-width: calc(100% - 32px);
+}
+.incident-notice b {
+  display: block;
+  font-size: max(15px, 2.4vmin);
+}
+.incident-notice small {
+  display: block;
+  color: #5f6672;
+  font-size: max(12px, 1.8vmin);
+}
+.incident-notice-icon {
+  width: max(38px, 5.6vmin);
+  height: max(38px, 5.6vmin);
+  border-radius: 50%;
+  background: #c2410c;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.incident-notice-btn {
+  margin-left: 1vmin;
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: #1f4fd8;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* slide 30: night vision */
+.night-tag {
+  position: absolute;
+  right: 1.2vmin;
+  bottom: 1.2vmin;
+  background: rgba(31, 79, 216, 0.85);
+  color: #fff;
+  font-size: max(11px, 1.5vmin);
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+.demo-tag {
+  position: fixed;
+  left: 50%;
+  bottom: 2vmin;
+  transform: translateX(-50%);
+  z-index: 8;
+  background: rgba(13, 15, 18, 0.85);
+  border: 1px solid #3a404a;
+  color: #cfd5de;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* long-press save feedback */
+.save-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 6vmin;
+  transform: translateX(-50%);
+  z-index: 9;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1b1d22;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 999px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+.live-root {
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
